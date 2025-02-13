@@ -14,6 +14,7 @@ typedef struct {
 	Value stack[STACK_MAX];
 	Value* stackTop; //using direct pointer as it is faster to dereference poiter than calculate offset 
 					//from index each time. It always points to the last item (place for next item)
+	Obj* objects;
 } VM;
 
 typedef enum {
@@ -21,6 +22,8 @@ typedef enum {
 	INTERPRET_COMPILE_ERROR,
 	INTERPRET_RUNTIME_ERROR
 } InterpretResult;
+
+extern VM vm;
 
 void initVM();
 void freeVM();
