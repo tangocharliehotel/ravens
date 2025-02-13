@@ -6,6 +6,8 @@
 
 #define STACK_MAX 256
 
+//TODO: change so that errors go from fatal (and halt the interpertor), to just push error and enable user to recover form error
+
 typedef struct {
 	Chunk* chunk;
 	uint8_t* ip; //instruction pointer to keep track of instruction to be currently being executed by VM

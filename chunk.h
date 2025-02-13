@@ -7,10 +7,17 @@
 //Instructions
 typedef enum {
 	OP_CONSTANT, //Consider adding OP_CONSTANT_16 to store index as a two byte operand, to handle more constants when needed
+	OP_NIL,
+	OP_TRUE,
+	OP_FALSE,
+	OP_EQUAL,
+	OP_GREATER,
+	OP_LESS,
 	OP_ADD,
 	OP_SUBTRACT,
 	OP_MULTIPLY,
 	OP_DIVIDE,
+	OP_NOT,
 	OP_NEGATE,
 	OP_RETURN,
 } OpCode;
