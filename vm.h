@@ -16,6 +16,7 @@ typedef struct {
 	Value* stackTop; //using direct pointer as it is faster to dereference poiter than calculate offset 
 					//from index each time. It always points to the last item (place for next item)
 	Table strings;
+	Table globals;
 	Obj* objects;
 } VM;
 
