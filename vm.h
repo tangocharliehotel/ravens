@@ -12,7 +12,7 @@
 //TODO: change so that errors go from fatal (and halt the interpertor), to just push error and enable user to recover form error
 
 typedef struct {
-	ObjFunction* function;
+	ObjClosure* closure;
 	uint8_t* ip;
 	Value* slots;
 } CallFrame;
