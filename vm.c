@@ -36,7 +36,7 @@ static void runtimeError(const char* format, ...) {
 	
 	for (int i = vm.frameCount - 1; i >= 0; i--) {
 		CallFrame* frame = &vm.frames[i];
-		ObjClosure* closure = frame->closure->function;
+		ObjFunction* function = frame->closure->function;
 		size_t instruction = frame->ip - function->chunk.code - 1;
 		fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
 		if (function->name == NULL) {
@@ -109,7 +109,7 @@ static bool callValue(Value callee, int argCount) {
 	if (IS_OBJ(callee)) {
 		switch (OBJ_TYPE(callee)) {
 			case OBJ_FUNCTION:
-				return call(AS_FUNCTION(callee), argCount);
+				return call(AS_CLOSURE(callee), argCount);
 			case OBJ_CLOSURE:
 				return call(AS_CLOSURE(callee), argCount);
 			case OBJ_NATIVE: {
@@ -125,6 +125,11 @@ static bool callValue(Value callee, int argCount) {
 	}
 	runtimeError("Can only call functions and classes.");
 	return false;
+}
+
+static ObjUpvalue* capturedUpvalue(Value* local) {
+	ObjUpvalue* createdUpvalue = newUpvalue(local);
+	return createdUpvalue;
 }
 
 static bool isFalsey(Value value) {
@@ -223,6 +228,16 @@ static InterpretResult run() {
 					}
 					break;
 				}
+				case OP_GET_UPVALUE: {
+					uint8_t slot = READ_BYTE();
+					push(*frame->closure->upvalues[slot]->location);
+					break;
+				}
+				case OP_SET_UPVALUE: {
+					uint8_t slot = READ_BYTE();
+					*frame->closure->upvalues[slot]->location = peek(0);
+					break;
+				}
 				case OP_EQUAL: {
 					Value b = pop();
 					Value a = pop();
@@ -290,6 +305,15 @@ static InterpretResult run() {
 					ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
 					ObjClosure* closure = newClosure(function);
 					push(OBJ_VAL(closure));
+					for(int i = 0; i < closure->upvalueCount; i++) {
+						uint8_t isLocal = READ_BYTE();
+						uint8_t index = READ_BYTE();
+						if(isLocal) {
+							closure->upvalues[i] = capturedUpvalue(frame->slots + index);
+						} else {
+							closure->upvalues[i] = frame->closure->upvalues[index];
+						}
+					}					
 					break;
 				}
 				case OP_RETURN: {
