@@ -26,6 +26,7 @@ typedef struct {
 					//from index each time. It always points to the last item (place for next item)
 	Table strings;
 	Table globals;
+	ObjUpvalue* openUpvalues;
 	Obj* objects;
 } VM;
 
